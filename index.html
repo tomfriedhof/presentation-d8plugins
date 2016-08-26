@@ -1,0 +1,480 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/beige.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-background-image="img/drupal-8-plugins-slide-01.jpg">
+					<p style="color: white; position: absolute; right: -100px; bottom: -600px;">
+						Presented by: <a href="http://twitter.com/tomfriedhof" style="color: white">Tom Friedhof</a>
+					</p>
+				</section>
+
+				<section>
+					<section>
+						<h1 style="text-align: left ">Tom Friedhof</h1>
+						<div style="width: 25%; float: left;">
+							<img src="img/me.jpg" class="no-border" />
+						</div>
+						<div style="width: 75%; float: left;">
+							<ul style="list-style: none">
+								<li>Senior Solutions Architect at <a href="http://activelamp.com">ActiveLAMP</a></li>
+								<li><a href="http://twitter.com/tomfriedhof">@tomfriedhof</a></li>
+								<li><a href="http://twitter.com/activelamp">@activelamp</a></li>
+							</ul>
+							<p class="fragment">...around since Drupal 4.7</p>
+						</div>
+						<aside class="notes">
+							<ul>
+								<li>we are a Los Angeles based Digital Agency</li>
+								<li>Drupal is our platform of choice.</li>
+								<li>Our agency has been working on the Drupal platform now for about a decade.  We've been part of the LA Drupal community for a while.</li>
+							</ul>
+						</aside>
+					</section>
+					<section>
+						<div style="display: flex; flex-wrap: nowrap">
+							<div style="font-size: 1.8rem; text-align: left;">
+								<p>ActiveLAMP <em>partners with organizations</em> to develop compelling digital experiences that <em>solve specific organizational goals</em>.</p>
+								<ul style="font-size: 1.4rem;">
+									<li style="padding-bottom: 10px">Our team has extensive industry experience building large software projects at scale.</li>
+									<li style="padding-bottom: 10px">Based in Los Angeles, CA</li>
+									<li style="padding-bottom: 10px">Higher Education, Non-Profits, Enterprise...</li>
+								</ul>
+							</div>
+							<div style="">
+								<img src="img/activelamp_square_logo.png" alt="ActiveLAMP Logo" style="border: none; box-shadow: none; width: 50%">
+							</div>
+						</div>
+						<div class="fragment">
+							<ul style="list-style: none; display: flex; justify-content: space-between">
+								<li><img src="img/drupal-8-logo.png" alt="" style="border: none; box-shadow: none;"></li>
+								<li><img src="img/logo_symfony.png" alt="" style="border: none; box-shadow: none;"></li>
+								<li><img src="img/laravel-cb-logo1.png" alt="" style="border: none; box-shadow: none;"></li>
+							</ul>
+						</div>
+					</section>
+					<section data-background-image="img/join-our-team-slide.jpg" data-background-size="contain">
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>What I'm going to cover:</h2>
+						<ul>
+							<li>What / Why plugin architecture</li>
+							<li>A practical example using plugins</li>
+							<li>Bare necessities to begin writing plugin types in D8</li>
+						</ul>
+					</section>
+					<section>
+						<h2>What I'm not going to cover:</h2>
+						<p>Not a deep dive of the plugin system:</p>
+						<ul>
+							<li class="fragment">Derivatives</li>
+							<li class="fragment">Discovery Options</li>
+							<li class="fragment">The D8 Plugin system internals</li>
+						</ul>
+					</section>
+					<section>
+						<h1>Pragmatic Plugin Types</h1>
+						<aside class="notes">
+							<p>Should walk away with:</p>
+							<ul>
+								<li>a practical approach to using plugins</li>
+								<li>Enough knowledge to begin writing your own plugin types.</li>
+								<li>Not going to get lost in the details.</li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<h2>Prerequisites for this talk:</h2>
+					<p>Basic OOP knowledge</p>
+
+					<ul>
+						<li class="fragment">Interfaces</li>
+						<li class="fragment">Inheritance</li>
+						<li class="fragment">Encapsulation</li>
+					</ul>
+
+					<aside class="notes">
+						<p>I won't be digging into the details of OOP</p>
+					</aside>
+				</section>
+
+				<section>
+					<section>
+						<h2>What is a plugin?</h2>
+						<blockquote>
+							Plugins are small pieces of functionality that are swappable. Plugins that perform similar functionality are of the same plugin type.
+						</blockquote>
+						<a href="https://www.drupal.org/developing/api/8/plugins">https://www.drupal.org/developing/api/8/plugins</a>
+					</section>
+					<section>
+						<h2>Example Scenario:</h2>
+						<p>I want to build a webpage that shows all the open tasks for a project, and the tasks exist in an external system (i.e. Jira)</p>
+						<p class="fragment fade-down">I can write a module to do that!</p>
+						<em class="fragment fade-down">jira_tasklist</em>
+					</section>
+					<section>
+						<h2>Module Requirments</h2>
+						<ul>
+							<li>Define a route for the page</li>
+							<li>Define the controller logic for the route</li>
+							<ul id="postfragment">
+								<li>Authenticate with Jira</li>
+								<li>Request a list of tasks from Jira</li>
+							</ul>
+							<li>Define a template for the page to pass task data to</li>
+						</ul>
+						<br />
+						<br />
+						<h3 class="fragment trello">What if I want to use Trello for some projects?</h3>
+					</section>
+					<section>
+						<blockquote>
+							Plugins are small pieces of functionality that are swappable. Plugins that perform similar functionality are of the same plugin type.
+						</blockquote>
+						<aside class="notes">
+							<p>Let's look at the definition again.</p>
+							<p>You think to yourself (next slide).</p>
+						</aside>
+					</section>
+					<section>
+						<h1>Don't we have this capability in PHP already?</h1>
+					</section>
+					<section>
+						<h1>Interfaces</h1>
+						<p class="fragment">Object interfaces allow you to create code which specifies which methods a class must implement, without having to define how these methods are handled.</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Code to an interface</h2>
+						<pre style="margin: 60px auto"><code data-trim contenteditable style="padding: 20px 15px;">
+/**
+ * Defines an interface for for interacting with project management systems.
+ */
+interface ProjectManagementInterface {
+
+  /**
+   * Authenticate with the the PM system.
+   */
+  public function auth();
+
+  /**
+   * Return a task list from PM system.
+   */
+  public function getTasks();
+}
+						</code></pre>
+					</section>
+					<section>
+						<h2>PHP will enforce the contract</h2>
+						<pre style="margin: 60px auto"><code data-trim contenteditable style="padding: 20px 15px;">
+/**
+ * Get stuff from Jira.
+ */
+class JiraTaskList implements ProjectManagementInterface {}
+						</code></pre>
+						<pre style="margin: 60px auto"><code data-trim contenteditable style="padding: 20px 15px;">
+/**
+ * Get stuff from Trello.
+ */
+class TrelloTaskList implements ProjectManagementInterface {}
+						</code></pre>
+					</section>
+					<section>
+						<h2>Yay! Swappable functionality!</h2>
+						<img src="img/yay.gif" alt="">
+						<h1 class="fragment fade-up">Don't celebrate yet.</h1>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>How do you swap the functionality out?</h1>
+					</section>
+					<section>
+						<h2>The service container silly</h2>
+						<p style="text-align: left">tasklist.services.yml</p>
+						<pre><code data-trim contenteditable style="padding: 20px 15px;">
+services:
+  tasklist.pm_system:
+    class: Drupal\tasklist\JiraTaskList
+						</code></pre>
+						<p style="text-align: left">MyModuleController.php</p>
+						<pre><code data-trim contenteditable style="padding: 20px 15px;">
+/**
+ * Module Controller.
+ */
+class MyController extends ControllerBase {
+  function index() {
+    $taskList = \Drupal::getContainer()->get('tasklist.pm_system');
+    ...
+  }
+}
+						</code></pre>
+						<sub class="fragment">BTW... don't access the service container this way.</sub>
+						<aside class="notes">
+							<p>The proper way to access the service container is overriding the create method in your controller</p>
+						</aside>
+					</section>
+					<section>
+						<h2>Code deploy just to swap out the functionality?</h2>
+					</section>
+					<section>
+						<h1>Fail</h1>
+						<img src="img/fail.gif" alt="" style="width: 80%">
+						<aside class="notes">
+							<p>Hope nothing breaks!</p>
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Plugin's are more than swappable functionality</h2>
+					</section>
+					<section>
+						<h2>What is a plugin?</h2>
+						<blockquote>Plugins are much like PHP native interfaces with a little extra: the plugin system can discover every implementation of an interface (the default is magic namespacing), deals with metadata (by default this is provided by annotations) and provides a factory for the plugin classes.</blockquote>
+						<a href="https://www.drupal.org/node/1637614">https://www.drupal.org/node/1637614</a>
+					</section>
+					<section>
+						<h1>Why plugins?</h1>
+						<p style="text-align: left">
+							The Drupal 8 plugin system provides a way to discover plugins within modules, grab metadata about the plugin, and provide a method of instantiating the plugin class when needed.</p>
+						<div style="text-align: left">
+							<ul>
+								<li class="fragment fade-left">Discovery</li>
+								<li class="fragment fade-left">Metadata</li>
+								<li class="fragment fade-left">Factory</li>
+							</ul>
+						</div>
+					</section>
+					<section>
+						<h1>Plugins vs Services</h1>
+						<aside class="notes">
+							<p>Plugins are meant for the use case where you have many possible components that you can swap in.  Services are much large in scope and are meant to have only one instance of the functionality.  You can think of the DB abstraction layer, or the caching system.</p>
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+  				  <h2>How to start using plugins</h2>
+					<p class="fragment" style="text-align: left">D8 needs to know:</p>
+  				  <ul>
+  				    <li class="fragment">
+						Plugin Type (The "PluginManager")
+					  <ul><li class="fragment">The Interface for the Plugin</li></ul>
+					</li>
+  				    <li class="fragment">Plugin Discovery (Commonly using Annotations)</li>
+  				    <li class="fragment">Plugin Factory (Also the "PluginManager")</li>
+  				  </ul>
+					<h3 style="margin-top: 20px" class="fragment"><em>Responsible developers provide a BaseClass</em></h3>
+  				</section>
+
+  				<section>
+  				  <h2>PluginManager</h2>
+  				  <p>Start by extending a base class: <em>DefaultPluginManager</em></p>
+            <pre style="margin: 60px auto"><code data-trim contenteditable style="padding: 20px 15px;">
+/**
+ * Project management system plugin manager.
+ */
+class ProjectManagementManager extends DefaultPluginManager {
+
+  /**
+   * Constructs an ProjectManagementManager object.
+   *
+   * @param \Traversable $namespaces
+   *   An object that implements \Traversable which contains the root paths
+   *   keyed by the corresponding namespace to look for plugin implementations,
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   *   Cache backend instance to use.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler to invoke the alter hook with.
+   */
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+    parent::__construct('Plugin/ProjectManagement', $namespaces, $module_handler, 'Drupal\projectmanagement\ProjectManagementInterface', 'Drupal\projectmanagement\Annotation\ProjectManagement');
+  }
+}
+  					</code></pre>
+					<aside class="notes">
+						<p>
+							With most OOP systems, you typically start by extending a base class.
+							You'll see later, that as a responsible developer, we'll provide a base class for users of our new plugin that we're creating too.
+						</p>
+					</aside>
+  				</section>
+
+  				<section>
+  				  <h2>Define how the Annotation</h2>
+            <pre style="margin: 60px auto"><code data-trim contenteditable style="padding: 20px 15px;">
+use Drupal\Component\Annotation\Plugin;
+
+/**
+ *
+ * @Annotation
+ */
+class ProjectManagment extends Plugin {
+
+  /**
+   * The plugin name.
+   *
+   * @var string
+   */
+  public $name;
+
+  /**
+   * The plugin description.
+   *
+   * @var string
+   */
+  public $description;
+}
+  					</code></pre>
+  				</section>
+
+  				<section>
+  				  <h2>Define the Plugin</h2>
+            <pre style="margin: 60px auto"><code data-trim contenteditable style="padding: 20px 15px;">
+/**
+ * Define the Jira plugin.
+ *
+ * @ProjectManagment(
+ *   id = "jira"
+ * )
+ */
+ class Jira {}
+  					</code></pre>
+  				</section>
+
+  				<section>
+  				  <h2>Define the Interface</h2>
+  				  <pre style="margin: 60px auto"><code data-trim contenteditable style="padding: 20px 15px;">
+/**
+ * Defines an interface for for interacting with project management systems.
+ */
+interface ProjectManagementInterface extends PluginInspectionInterface {
+
+  /**
+   * Authenticate with the the PM system.
+   */
+  public function auth();
+
+  /**
+   * Return a task list from PM system.
+   */
+  public function getTasks();
+}
+  					</code></pre>
+  				</section>
+
+  				<section>
+  				  <h2>Define a base class if there is common functionality</h2>
+            <pre style="margin: 60px auto"><code data-trim contenteditable style="padding: 20px 15px;">
+class ProjectManagementBase extends PluginBase implements ProjectManagmentInterface {
+
+}
+  					</code></pre>
+  				</section>
+
+  				<section>
+  				  <h2>Extend the base class</h2>
+            <pre style="margin: 60px auto"><code data-trim contenteditable style="padding: 20px 15px;">
+/**
+ * Define the Jira plugin.
+ *
+ * @ProjectManagment(
+ *   id = "jira"
+ * )
+ */
+ class Jira extends ProjectManagementBase {
+   public function auth() {}
+   public function getTasks() {}
+ }
+  					</code></pre>
+				</section>
+			</section>
+			<section>
+			  <h1>Demo</h1>
+			</section>
+
+			<section data-background-video="img/Slide-Video.mp4" data-background-video-loop>
+				<div style="position: relative; bottom: -200px">
+					<h2 style="color: #F68A30; text-shadow: 2px 2px #333;">Subscribe to our YouTube Channel</h2>
+					<a href="http://youtube.com/activelamp" style="color: #F68A30; text-shadow: 1px 1px #333;">http://youtube.com/activelamp</a>
+				</div>
+
+			</section>
+
+			<section style="text-align: left;"  data-background-video="img/Website-Loop.mov" data-background-video-loop>
+				<div style="width: 60%; float: left">
+					<h1>Questions?</h1>
+					<p>Send me an email:</p>
+					<em>tom@activelamp.com</em>
+					<br /><br />
+					<em>or in IRC #drupal-la</em>
+				</div>
+				<div style="width: 40%; float: left">
+					<img src="img/activelamp_square_logo.png" style="border: none; box-shadow: none" />
+				</div>
+			</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+    <script>
+    Reveal.addEventListener('fragmentshown', function(event) {
+      var fragment = Array.prototype.slice.call(event.fragment.classList, 0);
+      console.log(fragment);
+      if (fragment.indexOf('trello') > -1) {
+        var elem = document.getElementById("postfragment")
+        elem.style.color="#c02126"; 
+        elem.style.fontSize= "1.1em";
+      }
+    });
+    </script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
