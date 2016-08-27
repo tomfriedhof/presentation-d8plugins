@@ -396,7 +396,7 @@ interface ProjectManagementInterface extends PluginInspectionInterface {
   				</section>
 
   				<section>
-  				  <h2>Define a base class if there is common functionality</h2>
+  				  <h2>Define a base class for common functionality</h2>
             <pre style="margin: 60px auto"><code data-trim contenteditable style="padding: 20px 15px;">
 class ProjectManagementBase extends PluginBase implements ProjectManagmentInterface {
 
@@ -411,7 +411,8 @@ class ProjectManagementBase extends PluginBase implements ProjectManagmentInterf
  * Define the Jira plugin.
  *
  * @ProjectManagment(
- *   id = "jira"
+ *   id = "jira",
+ *   label = "Atlassian Jira"
  * )
  */
  class Jira extends ProjectManagementBase {
@@ -419,10 +420,32 @@ class ProjectManagementBase extends PluginBase implements ProjectManagmentInterf
    public function getTasks() {}
  }
   					</code></pre>
+					<p class="fragment">Notice that the metadata is baked into the same plugin file</p>
+				</section>
+				<section>
+					<h2>All plugin functionality is Encapsulated</h2>
+					<ul>
+						<li class="fragment">No <em>hook_tasklist_info()</em></li>
+						<li class="fragment">No guessing what functions to define to make it function</li>
+						<li class="fragment">PHP Interfaces enforce the contract</li>
+					</ul>
 				</section>
 			</section>
+
 			<section>
-			  <h1>Demo</h1>
+				<section>
+					<h1>Demo</h1>
+				</section>
+			  	<section>
+					<h2>Pro tip: Use Drupal Console</h2>
+					<ul>
+						<li>drupal generate:module</li>
+						<li>drupal generate:controller</li>
+						<li>drupal generate:service</li>
+						<li>drupal generate:plugin:type:annotation</li>
+						<li>drupal generate:form:config</li>
+					</ul>
+				</section>
 			</section>
 
 			<section data-background-video="img/Slide-Video.mp4" data-background-video-loop>
